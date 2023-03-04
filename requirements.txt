@@ -1,4 +1,4 @@
 Flask
 openai
 line-bot-sdk
-opencensus-ext-azure
+gunicorn
