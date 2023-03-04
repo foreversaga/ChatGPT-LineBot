@@ -37,4 +37,8 @@ def callChatGPT(message):
 
     return response.choices[0].text
 
+@app.route('/')
+def hello():
+    return "Hello World!"
+
 app.run()
