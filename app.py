@@ -41,4 +41,4 @@ def callChatGPT(message):
 def hello():
     return "Hello World!"
 
-app.run()
+app.run(host='127.0.0.1', port=8080)
