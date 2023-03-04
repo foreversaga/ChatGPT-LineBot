@@ -37,7 +37,7 @@ app = Flask(__name__)
 
 #     return response.choices[0].text
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def hello():
     return "Hello World!"
 
