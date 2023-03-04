@@ -41,4 +41,4 @@ app = Flask(__name__)
 def hello():
     return "Hello World!"
 
-app.run(host='0.0.0.0', port=8000)
+app.run(host='0.0.0.0')
