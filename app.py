@@ -6,9 +6,9 @@ import openai, os
 
 app = Flask(__name__)
 
-openai.api_key = os.environ.get('CHATGPT_API_KEY')
-lineBotApi = LineBotApi(os.environ.get('LINE_BOT_ACCESS_TOKEN'))
-handler = WebhookHandler(os.environ.get('LINE_BOT_CHANNEL_SECRET'))
+openai.api_key = os.environ['CHATGPT_API_KEY']
+lineBotApi = LineBotApi(os.environ['LINE_BOT_ACCESS_TOKEN'])
+handler = WebhookHandler(os.environ['LINE_BOT_CHANNEL_SECRET'])
 
 @app.route('/callback', methods=['POST'])
 def callback():
