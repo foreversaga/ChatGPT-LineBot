@@ -2,7 +2,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import openai, os
+import openai, os, json
 
 app = Flask(__name__)
 
@@ -29,12 +29,30 @@ def handle_message(event):
     print('Line message: ' + message)
     if '貓貓告訴我' in message:
         try:
-            response = callChatGPT(message.replace('貓貓告訴我', ''))
+            response = callDavinci(message.replace('貓貓告訴我', ''))
             lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
         except Exception as e:
             print(e)
+            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
+    elif '貓貓幫我' in message:
+        try:
+            response = callGTPTurbo(message.replace('貓貓幫我', ''))
+            lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
+        except Exception as e:
+            print(e)
+            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
 
-def callChatGPT(message):
+def callDavinci(message):
+    response = openai.Completion.create(
+    engine="text-davinci-003",
+    prompt=message,
+    temperature=0.7,
+    max_tokens=1024)
+
+    print('ChatGPT response: ' + response.choices[0].text)
+    return response.choices[0].text
+
+def callGTPTurbo(message):
     messages = [{
         'content': message,
         'role': 'system'
@@ -45,12 +63,26 @@ def callChatGPT(message):
     messages=messages,
     temperature=0.7,
     max_tokens=1024)
-    print('ChatGPT response: ' + response)
-    return response.choices[0].text
+
+    messageJson = json.dumps(response.choices)
+
+    contents = map(lambda item: item['message']['content'], json.loads(messageJson))
+    if len(contents) > 0:
+        print('ChatGPT response: ' + messageJson)
+        return '\n'.join(contents)
+    else:
+        return '這件事貓貓沒辦法幫你。'
 
 @app.route('/', methods=['GET'])
 def hello():
     return "Hello World!"
+
+@app.route('/test', methods=['GET'])
+def testChatGPT():
+    
+    message = request.args.get('message')
+    response = callGTPTurbo(message)
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ.get('PORT', 80))
