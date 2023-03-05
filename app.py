@@ -27,7 +27,7 @@ def callback():
 def handle_message(event):
     message = event.message.text
     print('Line message: ' + message)
-    if message.includes('貓貓告訴我'):
+    if '貓貓告訴我' in message:
         response = callChatGPT(message.replace('貓貓告訴我', ''))
         lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
 
