@@ -37,7 +37,7 @@ def handle_message(event):
 def callChatGPT(message):
     messages = [{
         'content': message,
-        'role': 'System'
+        'role': 'system'
     }]
 
     response = openai.ChatCompletion.create(
