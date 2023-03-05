@@ -27,11 +27,12 @@ def callback():
 def handle_message(event):
     message = event.message.text
     print('Line message: ' + message)
-    if "貓貓告訴我" in message:
-        message = message.replace('貓貓告訴我', '')
-        print('ChatGPT message: ' + message)
-        response = callChatGPT(message)
-        lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
+    if '貓貓告訴我' in message:
+        try:
+            response = callChatGPT(message.replace('貓貓告訴我', ''))
+            lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
+        except Exception as e:
+            print(e)
 
 def callChatGPT(message):
     response = openai.Completion.create(
