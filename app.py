@@ -70,7 +70,8 @@ def callGTPTurbo(message):
 
     messageJson = json.dumps(response.choices)
 
-    contents = map(lambda item: item['message']['content'], json.loads(messageJson))
+    contents = list(map(lambda item: item['message']['content'], json.loads(messageJson)))
+    print(contents)
     if len(contents) > 0:
         print('ChatGPT response: ' + messageJson)
         return '\n'.join(contents)
