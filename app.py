@@ -50,7 +50,11 @@ def callDavinci(message):
     max_tokens=1024)
 
     print('ChatGPT response: ' + json.dumps(response))
-    return response['choices'][0]['text']
+    aiMessage = response['choices'][0]['text'].split('\n\n')
+    if len(aiMessage) > 1:
+        return aiMessage[1]
+    else:
+        return aiMessage[0]
 
 def callGTPTurbo(message):
     messages = [{
