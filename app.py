@@ -35,7 +35,7 @@ def handle_message(event):
             print(e)
 
 def callChatGPT(message):
-    response = openai.Completion.create(
+    response = openai.ChatCompletion.create(
     engine="gpt-3.5-turbo",
     prompt=message,
     temperature=0.7,
