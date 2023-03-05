@@ -16,6 +16,7 @@ def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
+    print('Line request: ' + body)
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
@@ -30,11 +31,11 @@ def handle_message(event):
 
 def callChatGPT(message):
     response = openai.Completion.create(
-    engine="text-davinci-003",
+    engine="gpt-3.5-turbo",
     prompt=message,
     temperature=0.7,
     max_tokens=1024)
-
+    print('ChatGPT response: ' + response)
     return response.choices[0].text
 
 @app.route('/', methods=['GET'])
