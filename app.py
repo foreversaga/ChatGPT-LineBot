@@ -49,7 +49,7 @@ def callDavinci(message):
     temperature=0.7,
     max_tokens=1024)
 
-    print('ChatGPT response: ' + response)
+    print('ChatGPT response: ' + json.dumps(response))
     return response.choices[0].text
 
 def callGTPTurbo(message):
