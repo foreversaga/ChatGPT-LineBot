@@ -35,9 +35,14 @@ def handle_message(event):
             print(e)
 
 def callChatGPT(message):
+    messages = [{
+        'content': message,
+        'role': 'System'
+    }]
+
     response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
-    messages=[message],
+    messages=messages,
     temperature=0.7,
     max_tokens=1024)
     print('ChatGPT response: ' + response)
