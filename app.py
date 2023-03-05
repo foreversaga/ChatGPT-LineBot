@@ -26,8 +26,10 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     message = event.message.text
-    response = callChatGPT(message)
-    lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
+    print('Line message: ' + message)
+    if message.includes('貓貓告訴我'):
+        response = callChatGPT(message)
+        lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
 
 def callChatGPT(message):
     response = openai.Completion.create(
