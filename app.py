@@ -50,7 +50,7 @@ def callDavinci(message):
     max_tokens=1024)
 
     print('ChatGPT response: ' + json.dumps(response))
-    return response.choices[0].text
+    return response['choices'][0]['text']
 
 def callGTPTurbo(message):
     messages = [{
