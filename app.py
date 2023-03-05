@@ -1,7 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 import openai, os, json
 
 app = Flask(__name__)
@@ -41,6 +41,13 @@ def handle_message(event):
         except Exception as e:
             print(e)
             lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
+    elif '貓貓畫' in message:
+        try:
+            imageUrl = callImage(message.replace('貓貓畫', ''))
+            lineBotApi.reply_message(event.reply_token, ImageSendMessage(original_content_url=imageUrl, preview_image_url=imageUrl))
+        except Exception as e:  
+            print(e)
+            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
 
 def callDavinci(message):
     response = openai.Completion.create(
@@ -77,6 +84,15 @@ def callGTPTurbo(message):
         return '\n'.join(contents)
     else:
         return '這件事貓貓沒辦法幫你。'
+
+def callImage(prompt):
+   response = openai.Image.create(
+   prompt=prompt,
+   n=1,
+   size="1024x1024")
+   image_url = response['data'][0]['url']
+   print('Image response: ' + json.dumps(response))
+   return image_url
 
 @app.route('/', methods=['GET'])
 def hello():
