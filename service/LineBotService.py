@@ -1,7 +1,7 @@
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
-import os, ChatGPTService as gptService
+import os, service.ChatGPTService as gptService
 
 lineBotApi = LineBotApi(os.environ['LINE_BOT_ACCESS_TOKEN'])
 handler = WebhookHandler(os.environ['LINE_BOT_CHANNEL_SECRET'])
