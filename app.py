@@ -1,14 +1,8 @@
 from flask import Flask, request, abort
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
-import openai, os, json
+import os, service.ChatGPTService as gptService
+import service.LineBotService as lineBotService
 
 app = Flask(__name__)
-
-openai.api_key = os.environ['CHATGPT_API_KEY']
-lineBotApi = LineBotApi(os.environ['LINE_BOT_ACCESS_TOKEN'])
-handler = WebhookHandler(os.environ['LINE_BOT_CHANNEL_SECRET'])
 
 @app.route('/callback', methods=['POST'])
 def callback():
@@ -18,81 +12,10 @@ def callback():
     app.logger.info("Request body: " + body)
     print('Line request: ' + body)
     try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
+        lineBotService.handler.handle(body, signature)
+    except lineBotService.InvalidSignatureError:
         abort(400)
     return 'OK'
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    message = event.message.text
-    print('Line message: ' + message)
-    if '貓貓告訴我' in message:
-        try:
-            response = callDavinci(message.replace('貓貓告訴我', ''))
-            lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
-        except Exception as e:
-            print(e)
-            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
-    elif '貓貓幫我' in message:
-        try:
-            response = callGTPTurbo(message.replace('貓貓幫我', ''))
-            lineBotApi.reply_message(event.reply_token, TextSendMessage(text=response))
-        except Exception as e:
-            print(e)
-            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
-    elif '貓貓畫' in message:
-        try:
-            imageUrl = callImage(message.replace('貓貓畫', ''))
-            lineBotApi.reply_message(event.reply_token, ImageSendMessage(original_content_url=imageUrl, preview_image_url=imageUrl))
-        except Exception as e:  
-            print(e)
-            lineBotApi.reply_message(event.reply_token, TextSendMessage(text='貓貓壞了，請稍後再試。'))
-
-def callDavinci(message):
-    response = openai.Completion.create(
-    engine="text-davinci-003",
-    prompt=message,
-    temperature=0.7,
-    max_tokens=1024)
-
-    print('ChatGPT response: ' + json.dumps(response))
-    aiMessage = response['choices'][0]['text'].split('\n\n')
-    if len(aiMessage) > 1:
-        return aiMessage[1]
-    else:
-        return aiMessage[0]
-
-def callGTPTurbo(message):
-    messages = [{
-        'content': message,
-        'role': 'system'
-    }]
-
-    response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=messages,
-    temperature=0.7,
-    max_tokens=1024)
-
-    messageJson = json.dumps(response.choices)
-
-    contents = list(map(lambda item: item['message']['content'], json.loads(messageJson)))
-    print(contents)
-    if len(contents) > 0:
-        print('ChatGPT response: ' + messageJson)
-        return '\n'.join(contents)
-    else:
-        return '這件事貓貓沒辦法幫你。'
-
-def callImage(prompt):
-   response = openai.Image.create(
-   prompt=prompt,
-   n=1,
-   size="1024x1024")
-   image_url = response['data'][0]['url']
-   print('Image response: ' + json.dumps(response))
-   return image_url
 
 @app.route('/', methods=['GET'])
 def hello():
@@ -102,7 +25,7 @@ def hello():
 def testChatGPT():
     
     message = request.args.get('message')
-    response = callGTPTurbo(message)
+    response = gptService.callGTPTurbo(message)
     return response
 
 if __name__ == '__main__':
